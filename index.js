@@ -56,7 +56,7 @@ client.connect(err => {
       $set : {name : name,price : price, quantity : quantity,productTag : productTag}
     })
     .then(result => {
-      console.log(result);
+      res.send(result.modifiedCount > 0)
     })
   })
 
@@ -65,7 +65,7 @@ client.connect(err => {
   app.delete('/product/delete/:id', (req, res) => {
     productCollection.deleteOne({_id : ObjectId(req.params.id)})
     .then(result => {
-      console.log('delete');
+      res.send(result.deletedCount > 0)
     })
   })
 

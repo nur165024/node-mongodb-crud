@@ -53,6 +53,9 @@
             .then(res => res.json())
             .then(data => productAll(data))
             const productAll = (props) => {
+                let productDataAll = document.getElementById('productDataAll');
+                productDataAll.innerHTML = '';
+
                 props.forEach(element => {
                     let i = 1;
                     const tr = document.createElement('tr');
@@ -64,9 +67,9 @@
                         <td>${element.productTag}</td>
                         <button onclick="productEdit('${element._id}')" class="btn btn-sm btn-outline-success">Edit</button>
                         &nbsp;
-                        <button onclick="productDelete('${element._id}')" class="btn btn-sm btn-outline-danger">Delete</button>
+                        <button onclick="productDelete(event,'${element._id}')" class="btn btn-sm btn-outline-danger">Delete</button>
                     `;
-                    document.getElementById('productDataAll').appendChild(tr);        
+                    productDataAll.appendChild(tr);        
                 });          
             }
         }
@@ -109,16 +112,25 @@
                 body : JSON.stringify(product)
             })
             .then(res => res.json())
-            .then(data => console.log('updated'))
+            .then(data => {
+                if (data) {
+                    products();
+                    window.location.reload()
+                }
+            })
         }
 
         // product delete
-        const productDelete = (id) => {
+        const productDelete = (event,id) => {
             fetch(`/product/delete/${id}`,{
                 method : 'DELETE'
             })
             .then(res => res.json())
-            .then(data => console.log(data))
+            .then(data => {
+                if (data) {
+                    event.target.parentNode.style.display = 'none';
+                }
+            })
         }
 
     </script>
