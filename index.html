@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This is node crud page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <hr>
+        <div class="row justity-content-center">
+            <div class="col-md-5">
+                <!-- product create data -->
+                <div id="productForm">
+                    <h2>Product Create</h2>
+                    <form action="/product/store" method="POST">
+                        <input type="text" name="name" placeholder="Name" class="form-control">
+                        <br>
+                        <input type="text" name="price" placeholder="Price" class="form-control">
+                        <br>
+                        <input type="text" name="quantity" placeholder="Quantity" class="form-control">
+                        <br>
+                        <input type="text" name="productTag" placeholder="ProductTag" class="form-control">
+                        <br>
+                        <button class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <h2>Product list</h2>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Sl</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">quantity</th>
+                        <th scope="col">Tag</th>
+                        <th scope="col">Active</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productDataAll"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // product all load
+        const products = () => {
+            fetch('/product')
+            .then(res => res.json())
+            .then(data => productAll(data))
+            const productAll = (props) => {
+                props.forEach(element => {
+                    let i = 1;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${i++}</td>
+                        <td>${element.name}</td>
+                        <td>${element.price} Tk</td>
+                        <td>${element.quantity}</td>
+                        <td>${element.productTag}</td>
+                        <button onclick="productEdit('${element._id}')" class="btn btn-sm btn-outline-success">Edit</button>
+                        &nbsp;
+                        <button onclick="productDelete('${element._id}')" class="btn btn-sm btn-outline-danger">Delete</button>
+                    `;
+                    document.getElementById('productDataAll').appendChild(tr);        
+                });          
+            }
+        }
+        products();
+
+        // product edit
+        const productEdit = (id) => {
+            fetch(`/product/edit/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById('productForm').innerHTML = `
+                    <h2>Product Edit</h2>
+                    <input type="text" name="name" value="${data.name}" placeholder="Name" id="name" class="form-control">
+                    <br>
+                    <input type="text" name="price" value="${data.price}" placeholder="Price" id="price" class="form-control">
+                    <br>
+                    <input type="text" name="quantity" value="${data.quantity}" placeholder="Quantity" id="quantity" class="form-control">
+                    <br>
+                    <input type="text" name="productTag" value="${data.productTag}" placeholder="ProductTag" id="productTag" class="form-control">
+                    <br>
+                    <button class="btn btn-primary" onclick="updateData('${data._id}')">update</button>
+                `
+            })
+
+            
+        }
+
+        // product update 
+        const updateData = (id) => {
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+            const productTag = document.getElementById('productTag').value;
+            const product = {name,price,quantity,productTag}
+            // console.log(product);
+            fetch(`/product/update/${id}`,{
+                method : 'PATCH',
+                headers : {'Content-Type' : 'application/json'},
+                body : JSON.stringify(product)
+            })
+            .then(res => res.json())
+            .then(data => console.log('updated'))
+        }
+
+        // product delete
+        const productDelete = (id) => {
+            fetch(`/product/delete/${id}`,{
+                method : 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => console.log(data))
+        }
+
+    </script>
+</body>
+</html>
